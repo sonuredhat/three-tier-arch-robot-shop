@@ -32,6 +32,7 @@ stages:
       displayName: Detect Changed Services
       steps:
         - checkout: self
+          fetchDepth: 0 
         - bash: |
             echo "Detecting changed services..."
             CHANGED=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u | grep -E '^(web|rating|payment|shipping)$' || true)
@@ -58,6 +59,8 @@ stages:
             name: self-hosted
           steps:
             - checkout: self
+              fetchDepth: 0
+
 
             - task: Docker@2
               displayName: Build image ${{ svc }}
