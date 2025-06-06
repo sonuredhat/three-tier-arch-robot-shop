@@ -1,0 +1,77 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  paths:
+    include:
+      - web/**
+      - rating/**
+      - payment/**
+      - shipping/** 
+      - mysql/** 
+      - mongo/** 
+    exclude:
+      - README.md
+
+variables:
+  dockerHubRepo: sonudock/roboshop
+  tag: '$(Build.BuildId)'
+  dockerHubUser: sonudock
+  dockerHubConnection: DockerHubConnection
+
+pool:
+  name: cirunner  # name of your agent pool (must match exactly)
+
+
+stages:
+- stage: BuildPush
+  displayName: Build and Push Changed Services
+  jobs:
+  - job: DetectAndBuild
+    displayName: Detect changed services and build/push
+    steps:
+    - checkout: self
+
+    - bash: |
+        echo "Detecting changed services..."
+        CHANGED=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u | grep -E '^(web|rating|payment|shipping)$' || true)
+        echo "Changed services: $CHANGED"
+        echo "##vso[task.setvariable variable=changedServices;isOutput=true]$CHANGED"
+      name: detectChanges
+      displayName: Detect changed services
+
+- stage: BuildImages
+  displayName: Build & Push Images
+  dependsOn: BuildPush
+  condition: succeeded()
+  jobs:
+  - ${{ each svc in variables.services }}:
+      - job: BuildAndPush
+        displayName: Build & Push ${{ svc }}
+        dependsOn: DetectAndBuild
+        condition: contains(dependencies.BuildPush.outputs['detectChanges.changedServices'], '${{ svc }}')
+        pool:
+          name: self-hosted
+        steps:
+          - checkout: self
+
+          - task: Docker@2
+            displayName: Build image ${{ svc }}
+            inputs:
+              command: build
+              repository: $(dockerHubUser)/${{ svc }}
+              Dockerfile: $(Build.SourcesDirectory)/${{ svc }}/Dockerfile
+              tags: |
+                $(Build.SourceVersion)
+                latest
+
+          - task: Docker@2
+            displayName: Push image ${{ svc }}
+            inputs:
+              command: push
+              repository: $(dockerHubUser)/${{ svc }}
+              tags: |
+                $(Build.SourceVersion)
+                latest
+              containerRegistry: $(dockerHubConnection)
