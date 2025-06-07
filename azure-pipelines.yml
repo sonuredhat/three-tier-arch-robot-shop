@@ -33,6 +33,12 @@ stages:
       steps:
         - checkout: self
           fetchDepth: 1 
+        - script: |
+            echo "Fetching full git history..."
+            git fetch --unshallow || true
+            git fetch --all --tags
+          displayName: Ensure full git history
+          
         - bash: |
             echo "Detecting changed services..."
             CHANGED=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u | grep -E '^(web|rating|payment|shipping)$' || true)
