@@ -57,4 +57,4 @@ stages:
       displayName: Print the Changes Services
       steps:
         - bash: |
-            echo "Changed services are: $CHANGED "
+            echo "Changed services are: $CHANGED " > print.txt
