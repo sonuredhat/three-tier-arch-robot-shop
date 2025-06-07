@@ -44,6 +44,7 @@ stages:
             echo "Detecting changed services..."
             CHANGED=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u | grep -E '^(web|rating|payment|shipping)$' || true)
             echo "Detected: $CHANGED" > changes.txt 
+            cat changes.txt
             echo "##vso[task.setvariable variable=changedServices;isOutput=true]$CHANGED"
           name: detect
           displayName: Detect Changed Services
