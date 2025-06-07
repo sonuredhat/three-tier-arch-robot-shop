@@ -33,11 +33,7 @@ stages:
       workspace:
         clean: all
       steps:
-        - checkout: self
-          fetchDepth: 1 
         - script: |
             echo "Fetching full git history..."
-            git fetch --unshallow || true
-            git fetch --all --tags
           displayName: Ensure full git history
           
