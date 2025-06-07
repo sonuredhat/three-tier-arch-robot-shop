@@ -47,3 +47,14 @@ stages:
             echo "##vso[task.setvariable variable=changedServices;isOutput=true]$CHANGED"
           name: detect
           displayName: Detect Changed Services
+- stage: BuildPush
+  displayName: Build and Push Docker Images
+  dependsOn: DetectChanges
+  variables:
+    changedServices: $[ stageDependencies.DetectChanges.Detect.outputs['detect.changedServices'] ]
+  jobs:
+    - job: PrintChangesSVC
+      displayName: Print the Changes Services
+      steps:
+        - bash: |
+            echo "Changed services are: $CHANGED "
