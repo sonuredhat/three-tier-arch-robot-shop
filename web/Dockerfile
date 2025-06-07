@@ -1,6 +1,6 @@
 FROM alpine AS build
 ARG KEY
-#added a comment
+
 WORKDIR /instana
 
 RUN apk add --update --no-cache wget
