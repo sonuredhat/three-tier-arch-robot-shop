@@ -23,11 +23,6 @@ stages:
     - job: BuildAndPush
       displayName: Build & Push Web Image
       steps:
-        - task: Docker@2
-          displayName: Docker Login
-          inputs:
-            command: login
-            containerRegistry: $(dockerHubConnection)
         - checkout: self
           fetchDepth: 0
 
@@ -40,6 +35,11 @@ stages:
             tags: |
               $(tag)
               latest
+        - task: Docker@2
+          displayName: Docker Login
+          inputs:
+            command: login
+            containerRegistry: $(dockerHubConnection)
 
         - task: Docker@2
           displayName: Push image for web
