@@ -1,0 +1,47 @@
+# Docker CI for web service only
+
+trigger:
+  paths:
+    include:
+      - web/**
+    exclude:
+      - README.md
+
+variables:
+  dockerHubRepo: sonudock/roboshop
+  tag: '$(Build.BuildId)'
+  dockerHubUser: sonudock
+  dockerHubConnection: DockerHubConnection
+
+pool:
+  name: cirunner  # name of your agent pool (must match exactly)
+
+stages:
+- stage: BuildPush
+  displayName: Build and Push Docker Image for Web
+  jobs:
+    - job: BuildAndPush
+      displayName: Build & Push Web Image
+      steps:
+        - checkout: self
+          fetchDepth: 0
+
+        - task: Docker@2
+          displayName: Build image for web
+          inputs:
+            command: build
+            repository: $(dockerHubRepo)/web
+            Dockerfile: $(Build.SourcesDirectory)/web/Dockerfile
+            tags: |
+              $(tag)
+              latest
+
+        - task: Docker@2
+          displayName: Push image for web
+          inputs:
+            command: push
+            repository: $(dockerHubRepo)/web
+            tags: |
+              $(tag)
+              latest
+            containerRegistry: $(dockerHubConnection)
