@@ -48,9 +48,10 @@ stages:
             echo "##vso[task.setvariable variable=changedServices;isOutput=true]$CHANGED"
           name: detect
           displayName: Detect Changed Services
-
     - ${{ each svc in variables.services }}:
         - job: Build
+          variables:
+            changedServices: $[ stageDependencies.DetectChanges.Detect.outputs['detect.changedServices'] ]
           displayName: Build 
           condition: contains(variables['changedServices'], '${{ svc }}')
           steps:
