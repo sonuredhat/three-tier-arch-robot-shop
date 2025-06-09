@@ -1,7 +1,7 @@
 FROM alpine AS build
 ARG KEY
 WORKDIR /instana
-#changes
+
 RUN apk add --update --no-cache wget
 
 ENV ARTI_PATH='artifact-public.instana.io/artifactory/shared/com/instana/nginx_tracing/'
