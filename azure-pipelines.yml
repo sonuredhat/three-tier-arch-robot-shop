@@ -36,8 +36,8 @@ stages:
             containerRegistry: $(dockerHubConnection)
             command: build
             repository: $(dockerHubRepo)-$(serviceName)
-            # Dockerfile: $(Build.SourcesDirectory)/web/Dockerfile
-            Dockerfile: $(serviceName)/Dockerfile
+            Dockerfile: $(Build.SourcesDirectory)/$(serviceName)/Dockerfile
+            # Dockerfile: $(serviceName)/Dockerfile
             tags: |
               $(tag)
               latest
@@ -51,7 +51,7 @@ stages:
           displayName: Push image for $(serviceName)
           inputs:
             command: push
-            repository: $(dockerHubRepo)
+            repository: $(dockerHubRepo)-$(serviceName)
             tags: |
               $(tag)
               latest
