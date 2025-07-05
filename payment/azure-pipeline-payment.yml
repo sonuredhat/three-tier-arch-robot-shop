@@ -9,7 +9,7 @@ trigger:
 
 
 variables:
-  serviceName: web
+  serviceName: payment
   dockerHubRepo: sonudock/roboshop
   tag: '$(Build.BuildId)'
   dockerHubUser: sonudock
